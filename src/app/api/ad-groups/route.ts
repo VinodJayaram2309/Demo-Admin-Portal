@@ -34,8 +34,15 @@ export async function GET() {
 
   try {
     const groups: GraphGroup[] = [];
+
+    // Fetches only the groups the signed-in user is a member of (requires GroupMember.Read.All)
     let nextLink: string | undefined =
-      'https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,mail,groupTypes&$top=100';
+      'https://graph.microsoft.com/v1.0/me/memberOf?$select=id,displayName,description,mail,groupTypes&$top=100';
+
+    // To fetch ALL AD groups in the tenant instead, uncomment the line below
+    // and grant Group.Read.All permission in Azure AD app registration.
+    // let nextLink: string | undefined =
+    //   'https://graph.microsoft.com/v1.0/groups?$select=id,displayName,description,mail,groupTypes&$top=100';
 
     while (nextLink) {
       const response = await fetch(nextLink, {
@@ -54,7 +61,7 @@ export async function GET() {
         if (response.status === 403) {
           return NextResponse.json(
             {
-              error: 'Insufficient permissions. Ensure the app has Group.Read.All permission.',
+              error: 'Insufficient permissions. Ensure the app has GroupMember.Read.All permission.',
             },
             { status: 403 }
           );
@@ -67,7 +74,11 @@ export async function GET() {
       }
 
       const data: GraphGroupsResponse = await response.json();
-      groups.push(...data.value);
+      // Filter to only include group objects (memberOf can also return directory roles)
+      const onlyGroups = data.value.filter(
+        (item: any) => item['@odata.type'] === '#microsoft.graph.group'
+      );
+      groups.push(...onlyGroups);
       nextLink = data['@odata.nextLink'];
     }
 
