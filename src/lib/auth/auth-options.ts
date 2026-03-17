@@ -1,7 +1,7 @@
 import { NextAuthOptions } from 'next-auth';
 import AzureADProvider from 'next-auth/providers/azure-ad';
-import { AUTH_CONFIG, getAllowedGroups } from '@/config/auth.config';
-import { fetchUserGroups, isUserInAllowedGroups } from '@/lib/auth/groups';
+import { AUTH_CONFIG } from '@/config/auth.config';
+import { fetchUserGroups } from '@/lib/auth/groups';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -33,19 +33,9 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, account, user }) {
       // Initial sign in
       if (account && user) {
-        // Fetch user's group memberships from Microsoft Graph API
-        const groups = await fetchUserGroups(account.access_token!);
-        
-        // Check if user is in allowed groups
-        const allowedGroups = getAllowedGroups();
-        const hasAccess = isUserInAllowedGroups(groups, allowedGroups);
-
-        if (!hasAccess && allowedGroups.length > 0) {
-          return {
-            ...token,
-            error: 'AccessDenied',
-          };
-        }
+        // Fetch user's group memberships (id + name) from Microsoft Graph API
+        const groupDetails = await fetchUserGroups(account.access_token!);
+        const groups = groupDetails.map((g) => g.id);
 
         return {
           ...token,
@@ -54,6 +44,7 @@ export const authOptions: NextAuthOptions = {
           refreshToken: account.refresh_token,
           accessTokenExpires: account.expires_at! * 1000,
           groups,
+          groupDetails,
         };
       }
 
@@ -75,6 +66,7 @@ export const authOptions: NextAuthOptions = {
         ...session.user,
         id: token.id || token.sub || '',
         groups: token.groups || [],
+        groupDetails: token.groupDetails || [],
         accessToken: token.accessToken,
       };
 
@@ -85,15 +77,6 @@ export const authOptions: NextAuthOptions = {
       if (!account) {
         return false;
       }
-
-      // Perform initial group check during sign-in
-      const groups = await fetchUserGroups(account.access_token!);
-      const allowedGroups = getAllowedGroups();
-
-      if (allowedGroups.length > 0 && !isUserInAllowedGroups(groups, allowedGroups)) {
-        return `${AUTH_CONFIG.routes.unauthorized}?error=not_in_group`;
-      }
-
       return true;
     },
   },

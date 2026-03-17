@@ -90,6 +90,9 @@ NEXTAUTH_SECRET=your-secret-key
 
 # Allowed AD Groups (comma-separated group Object IDs)
 ALLOWED_AD_GROUPS=group-id-1,group-id-2
+
+# Development only: bypass real Azure AD auth and use a mock dashboard session
+MOCK_AUTH=false
 ```
 
 Generate a secure `NEXTAUTH_SECRET`:
@@ -108,6 +111,18 @@ npm run dev
 npm run build
 npm start
 ```
+
+## Development Mock Authentication
+
+For local UI development, you can bypass real authentication and open protected pages like `/dashboard`.
+
+1. Set `MOCK_AUTH=true` in `.env.local`
+2. Start the app with `npm run dev`
+3. Open `/dashboard`
+
+Notes:
+- Mock auth is only active when `NODE_ENV=development`
+- Do not enable this in production environments
 
 ## Project Structure
 

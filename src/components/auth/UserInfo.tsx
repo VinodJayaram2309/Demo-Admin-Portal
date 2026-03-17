@@ -31,11 +31,12 @@ export function UserInfo() {
         
         <div>
           <label className="text-sm font-medium text-gray-500">AD Groups</label>
-          {session.user.groups && session.user.groups.length > 0 ? (
-            <ul className="list-disc list-inside text-gray-900">
-              {session.user.groups.map((group) => (
-                <li key={group} className="text-sm font-mono">
-                  {group}
+          {session.user.groupDetails && session.user.groupDetails.length > 0 ? (
+            <ul className="mt-1 space-y-1">
+              {session.user.groupDetails.map((group) => (
+                <li key={group.id} className="flex flex-col text-sm">
+                  <span className="font-medium text-gray-900">{group.name}</span>
+                  <span className="font-mono text-xs text-gray-500">{group.id}</span>
                 </li>
               ))}
             </ul>

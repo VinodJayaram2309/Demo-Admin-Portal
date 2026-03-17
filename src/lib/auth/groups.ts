@@ -13,14 +13,19 @@ interface GraphGroupsResponse {
   value: GraphGroup[];
 }
 
+export interface GroupDetail {
+  id: string;
+  name: string;
+}
+
 /**
  * Fetch user's group memberships from Microsoft Graph API
  * @param accessToken - The user's access token
- * @returns Array of group IDs the user belongs to
+ * @returns Array of GroupDetail objects (id + name) the user belongs to
  */
-export async function fetchUserGroups(accessToken: string): Promise<string[]> {
+export async function fetchUserGroups(accessToken: string): Promise<GroupDetail[]> {
   try {
-    const groups: string[] = [];
+    const groups: GroupDetail[] = [];
     let nextLink: string | undefined = 'https://graph.microsoft.com/v1.0/me/memberOf?$select=id,displayName';
 
     while (nextLink) {
@@ -39,8 +44,10 @@ export async function fetchUserGroups(accessToken: string): Promise<string[]> {
 
       const data: GraphGroupsResponse = await response.json();
 
-      // Extract group IDs
-      groups.push(...data.value.map((group) => group.id));
+      // Extract group ID and display name
+      groups.push(
+        ...data.value.map((group) => ({ id: group.id, name: group.displayName }))
+      );
 
       // Check for pagination
       nextLink = data['@odata.nextLink'];
@@ -57,10 +64,14 @@ export async function fetchUserGroups(accessToken: string): Promise<string[]> {
  * Check if user belongs to any of the allowed groups
  * @param userGroups - Array of group IDs the user belongs to
  * @param allowedGroups - Array of allowed group IDs
+/**
+ * Check if user belongs to any of the allowed groups
+ * @param userGroups - Array of GroupDetail objects the user belongs to
+ * @param allowedGroups - Array of allowed group IDs
  * @returns Boolean indicating if user has access
  */
 export function isUserInAllowedGroups(
-  userGroups: string[],
+  userGroups: GroupDetail[],
   allowedGroups: string[]
 ): boolean {
   // If no allowed groups are configured, allow all authenticated users
@@ -69,41 +80,41 @@ export function isUserInAllowedGroups(
   }
 
   // Check if user belongs to at least one allowed group
-  return userGroups.some((group) => allowedGroups.includes(group));
+  return userGroups.some((group) => allowedGroups.includes(group.id));
 }
 
 /**
  * Check if user belongs to a specific group
- * @param userGroups - Array of group IDs the user belongs to
+ * @param userGroups - Array of GroupDetail objects the user belongs to
  * @param groupId - The group ID to check
  * @returns Boolean indicating if user is in the group
  */
-export function isUserInGroup(userGroups: string[], groupId: string): boolean {
-  return userGroups.includes(groupId);
+export function isUserInGroup(userGroups: GroupDetail[], groupId: string): boolean {
+  return userGroups.some((group) => group.id === groupId);
 }
 
 /**
  * Check if user belongs to all specified groups
- * @param userGroups - Array of group IDs the user belongs to
+ * @param userGroups - Array of GroupDetail objects the user belongs to
  * @param requiredGroups - Array of required group IDs
  * @returns Boolean indicating if user is in all required groups
  */
 export function isUserInAllGroups(
-  userGroups: string[],
+  userGroups: GroupDetail[],
   requiredGroups: string[]
 ): boolean {
-  return requiredGroups.every((group) => userGroups.includes(group));
+  return requiredGroups.every((reqId) => userGroups.some((g) => g.id === reqId));
 }
 
 /**
  * Get the intersection of user groups and specified groups
- * @param userGroups - Array of group IDs the user belongs to
+ * @param userGroups - Array of GroupDetail objects the user belongs to
  * @param targetGroups - Array of target group IDs
- * @returns Array of matching group IDs
+ * @returns Array of matching GroupDetail objects
  */
 export function getMatchingGroups(
-  userGroups: string[],
+  userGroups: GroupDetail[],
   targetGroups: string[]
-): string[] {
-  return userGroups.filter((group) => targetGroups.includes(group));
+): GroupDetail[] {
+  return userGroups.filter((group) => targetGroups.includes(group.id));
 }

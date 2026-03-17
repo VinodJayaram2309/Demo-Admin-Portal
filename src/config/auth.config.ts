@@ -32,6 +32,7 @@ export const AUTH_CONFIG = {
   // Protected routes that require specific AD groups
   protectedRoutes: {
     '/dashboard': [] as string[], // Empty array means any authenticated user can access
+    '/secure': [] as string[], // Populated at runtime from SECURE_PAGE_AD_GROUPS env var
     '/admin': ['admin-group-id'] as string[], // Specific group required
   } as Record<string, string[]>,
 };
@@ -42,4 +43,21 @@ export const AUTH_CONFIG = {
 export function getAllowedGroups(): string[] {
   const groups = process.env.ALLOWED_AD_GROUPS || '';
   return groups.split(',').filter((group) => group.trim() !== '');
+}
+
+/**
+ * Get required AD groups for the Secure page from environment variable.
+ * Set SECURE_PAGE_AD_GROUPS as a comma-separated list of group IDs.
+ */
+export function getSecurePageGroups(): string[] {
+  const groups = process.env.SECURE_PAGE_AD_GROUPS || '';
+  return groups.split(',').filter((group) => group.trim() !== '');
+}
+
+/**
+ * Enable mock authentication for local development.
+ * Only active when NODE_ENV is development.
+ */
+export function isMockAuthEnabled(): boolean {
+  return process.env.NODE_ENV === 'development' && process.env.MOCK_AUTH === 'true';
 }
