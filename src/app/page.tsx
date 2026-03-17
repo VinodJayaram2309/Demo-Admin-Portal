@@ -1,6 +1,15 @@
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '@/lib/auth';
 import { AuthButton } from '@/components/auth';
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession(authOptions);
+
+  if (session) {
+    redirect('/dashboard');
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <div className="max-w-lg w-full text-center space-y-8">
@@ -20,9 +29,6 @@ export default function Home() {
 
         <div className="text-sm text-gray-500">
           <p>Sign in with your Microsoft account to access the dashboard.</p>
-          <p className="mt-2">
-            Only users in authorized AD groups will be granted access.
-          </p>
         </div>
       </div>
     </main>

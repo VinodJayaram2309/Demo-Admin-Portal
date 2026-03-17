@@ -69,14 +69,13 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except:
+     * - / (home/landing page — public)
      * - api/auth (NextAuth.js authentication routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public folder assets
-     * - public pages (/, /unauthorized, etc.)
+     * - public pages (/unauthorized, /auth/*)
      */
-    '/((?!api/auth|_next/static|_next/image|favicon.ico|unauthorized|auth).*)',
     '/dashboard/:path*',
     '/secure/:path*',
     '/admin/:path*',
