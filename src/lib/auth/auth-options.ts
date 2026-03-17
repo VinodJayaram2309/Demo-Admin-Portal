@@ -11,7 +11,7 @@ export const authOptions: NextAuthOptions = {
       tenantId: process.env.AZURE_AD_TENANT_ID!,
       authorization: {
         params: {
-          scope: 'openid profile email User.Read GroupMember.Read.All',
+          scope: 'openid profile email User.Read GroupMember.Read.All Group.Read.All',
         },
       },
     }),
@@ -110,7 +110,7 @@ async function refreshAccessToken(token: any): Promise<any> {
         client_secret: process.env.AZURE_AD_CLIENT_SECRET!,
         grant_type: 'refresh_token',
         refresh_token: token.refreshToken,
-        scope: 'openid profile email User.Read GroupMember.Read.All',
+        scope: 'openid profile email User.Read GroupMember.Read.All Group.Read.All',
       }),
     });
 

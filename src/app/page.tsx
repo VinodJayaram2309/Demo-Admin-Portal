@@ -15,12 +15,8 @@ export default async function Home() {
       <div className="max-w-lg w-full text-center space-y-8">
         <div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome to Next.js SSO App
+            Welcome to Admin App
           </h1>
-          <p className="text-gray-600">
-            Secure authentication with Microsoft Azure AD and group-based
-            authorization.
-          </p>
         </div>
 
         <div className="flex justify-center">
@@ -28,7 +24,7 @@ export default async function Home() {
         </div>
 
         <div className="text-sm text-gray-500">
-          <p>Sign in with your Microsoft account to access the dashboard.</p>
+          <p>Sign in with your Microsoft account to access the portal.</p>
         </div>
       </div>
     </main>

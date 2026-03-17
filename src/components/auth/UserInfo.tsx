@@ -29,7 +29,7 @@ export function UserInfo() {
           <p className="text-gray-900 text-sm font-mono">{session.user.id || 'N/A'}</p>
         </div>
         
-        <div>
+        {/* <div>
           <label className="text-sm font-medium text-gray-500">AD Groups</label>
           {session.user.groupDetails && session.user.groupDetails.length > 0 ? (
             <ul className="mt-1 space-y-1">
@@ -43,7 +43,7 @@ export function UserInfo() {
           ) : (
             <p className="text-gray-500 text-sm">No groups found</p>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

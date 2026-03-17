@@ -5,6 +5,7 @@ import { Session } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { UserInfo } from '@/components/auth';
 import { AuthButton } from '@/components/auth';
+import { FetchADGroupsButton } from '@/components/auth';
 import { isMockAuthEnabled } from '@/config/auth.config';
 
 export default async function DashboardPage() {
@@ -62,9 +63,7 @@ export default async function DashboardPage() {
                 <LockIcon />
                 Go to Secure Page
               </Link>
-              <button className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                Settings
-              </button>
+              <FetchADGroupsButton />
             </div>
           </div>
         </div>
